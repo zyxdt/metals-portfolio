@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { Link, useLocation } from "wouter";
+import { HorizontalAd } from "@/components/AdSense";
 import { 
   Sparkles, 
   TrendingUp, 
@@ -382,6 +383,11 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Ad Space - Bottom */}
+        <div className="mt-6 mb-6">
+          <HorizontalAd />
         </div>
       </main>
     </div>

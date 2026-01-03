@@ -4,7 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { useAuth } from "./_core/hooks/useAuth";
+import { SupabaseProvider, useSupabase } from "./contexts/SupabaseContext";
 import Home from "./pages/Home";
 import Prices from "./pages/Prices";
 import Dashboard from "./pages/Dashboard";
@@ -13,10 +13,12 @@ import AddHolding from "./pages/AddHolding";
 import EditHolding from "./pages/EditHolding";
 import Settings from "./pages/Settings";
 import MetalDetail from "./pages/MetalDetail";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
-// Protected route wrapper
+// Protected route wrapper using Supabase
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, loading } = useSupabase();
 
   if (loading) {
     return (
@@ -26,8 +28,8 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
     );
   }
 
-  if (!isAuthenticated) {
-    return <Redirect to="/" />;
+  if (!user) {
+    return <Redirect to="/login" />;
   }
 
   return <Component />;
@@ -39,6 +41,8 @@ function Router() {
       {/* Public routes */}
       <Route path="/" component={Home} />
       <Route path="/prices" component={Prices} />
+      <Route path="/login" component={Login} />
+      <Route path="/signup" component={Signup} />
       
       {/* Protected routes */}
       <Route path="/dashboard">
@@ -70,12 +74,14 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="dark">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
+      <SupabaseProvider>
+        <ThemeProvider defaultTheme="dark">
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </ThemeProvider>
+      </SupabaseProvider>
     </ErrorBoundary>
   );
 }

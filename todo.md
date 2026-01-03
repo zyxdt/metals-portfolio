@@ -50,3 +50,23 @@
 - [ ] Multiple portfolios per user
 - [ ] CSV export
 - [ ] Advanced charts
+
+
+## Supabase Migration
+- [x] Install Supabase client library
+- [x] Configure Supabase environment variables
+- [x] Create Supabase authentication context
+- [x] Build signup page with email/password
+- [x] Build login page with email/password
+- [ ] Create password reset functionality
+- [ ] Migrate user data to Supabase
+- [ ] Update API to use Supabase database
+- [ ] Remove Manus OAuth integration
+- [x] Test authentication flow
+
+## Google Ads Integration
+- [x] Add AdSense placeholder component
+- [x] Add ads to dashboard (bottom section)
+- [ ] Add ads to landing page sections
+- [ ] Add ads to metal detail pages
+- [x] Document how to configure Google AdSense code
