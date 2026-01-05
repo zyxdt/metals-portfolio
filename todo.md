@@ -58,11 +58,15 @@
 - [x] Create Supabase authentication context
 - [x] Build signup page with email/password
 - [x] Build login page with email/password
+- [x] Create Supabase auth API endpoints (signup, login, logout, me)
+- [x] Integrate auth API into Express server
+- [x] Create useSupabaseAuth hook for frontend
+- [x] Update App.tsx to use Supabase auth
+- [x] Update Login/Signup pages to use new auth
+- [x] Update tRPC context to use Supabase JWT tokens
+- [x] Remove Manus OAuth integration
 - [ ] Create password reset functionality
-- [ ] Migrate user data to Supabase
-- [ ] Update API to use Supabase database
-- [ ] Remove Manus OAuth integration
-- [x] Test authentication flow
+- [ ] Test end-to-end authentication flow
 
 ## Google Ads Integration
 - [x] Add AdSense placeholder component

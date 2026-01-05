@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useSupabase } from "@/contexts/SupabaseContext";
-import { Link, useLocation } from "wouter";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,43 +9,40 @@ import { Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Signup() {
-  const { signUp } = useSupabase();
-  const [, setLocation] = useLocation();
+  const { signup, loading, error } = useSupabaseAuth();
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLocalError(null);
 
     if (!email || !password || !confirmPassword) {
-      toast.error("Please fill in all fields");
+      setLocalError("Please fill in all fields");
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      setLocalError("Passwords do not match");
       return;
     }
 
     if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+      setLocalError("Password must be at least 6 characters");
       return;
     }
 
-    setLoading(true);
-
     try {
-      await signUp(email, password, name);
-      toast.success("Account created! Please check your email to verify.");
-      setLocation("/login");
+      await signup(email, password, name || undefined);
+      toast.success("Account created successfully!");
     } catch (error: any) {
-      toast.error(error.message || "Failed to create account");
-    } finally {
-      setLoading(false);
+      const errorMsg = error.message || "Failed to create account";
+      setLocalError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 
@@ -70,6 +67,13 @@ export default function Signup() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignup} className="space-y-4">
+              {/* Error Message */}
+              {(localError || error) && (
+                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                  <p className="text-sm text-red-500">{localError || error}</p>
+                </div>
+              )}
+
               {/* Name */}
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name (Optional)</Label>

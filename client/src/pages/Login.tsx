@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useSupabase } from "@/contexts/SupabaseContext";
-import { Link, useLocation } from "wouter";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,31 +9,28 @@ import { Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Login() {
-  const { signIn } = useSupabase();
-  const [, setLocation] = useLocation();
+  const { login, loading, error } = useSupabaseAuth();
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLocalError(null);
 
     if (!email || !password) {
-      toast.error("Please fill in all fields");
+      setLocalError("Please fill in all fields");
       return;
     }
 
-    setLoading(true);
-
     try {
-      await signIn(email, password);
+      await login(email, password);
       toast.success("Logged in successfully!");
-      setLocation("/dashboard");
     } catch (error: any) {
-      toast.error(error.message || "Failed to log in");
-    } finally {
-      setLoading(false);
+      const errorMsg = error.message || "Failed to log in";
+      setLocalError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 
@@ -58,6 +55,13 @@ export default function Login() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
+              {/* Error Message */}
+              {(localError || error) && (
+                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                  <p className="text-sm text-red-500">{localError || error}</p>
+                </div>
+              )}
+
               {/* Email */}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
