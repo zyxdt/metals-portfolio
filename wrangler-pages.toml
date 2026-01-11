@@ -1,0 +1,17 @@
+# Cloudflare Pages configuration
+# This is for the frontend deployment
+
+[build]
+command = "pnpm build"
+cwd = "."
+watch_paths = ["client/src/**/*.tsx", "client/src/**/*.ts"]
+
+[build.upload]
+dir = "dist"
+
+[env.production]
+name = "metalsdash"
+
+[env.production.vars]
+VITE_SUPABASE_URL = "https://mccsiaujlmoeklarjnpy.supabase.co"
+VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jY3NpYXVqbG1vZWtsYXJqbnB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczOTIzMTEsImV4cCI6MjA4Mjk2ODMxMX0.XIU0kd8ZWlii3AhkiGI9mnyN7jiyIQCbDSXcsxVmd5M"

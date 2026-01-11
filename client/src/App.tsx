@@ -4,7 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { useSupabaseAuth } from "./hooks/useSupabaseAuth";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Home from "./pages/Home";
 import Prices from "./pages/Prices";
 import Dashboard from "./pages/Dashboard";
@@ -16,9 +16,9 @@ import MetalDetail from "./pages/MetalDetail";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 
-// Protected route wrapper using Supabase Auth
+// Protected route wrapper using Auth Context
 function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
-  const { user, loading, isAuthenticated } = useSupabaseAuth();
+  const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
     return (
@@ -74,12 +74,14 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="dark">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider defaultTheme="dark">
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

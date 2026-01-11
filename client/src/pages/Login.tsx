@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import { Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Login() {
-  const { login, loading, error } = useSupabaseAuth();
+  const { login, loading, error } = useAuth();
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

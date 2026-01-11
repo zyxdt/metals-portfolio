@@ -74,3 +74,19 @@
 - [ ] Add ads to landing page sections
 - [ ] Add ads to metal detail pages
 - [x] Document how to configure Google AdSense code
+
+
+## Live Prices Fix
+- [x] Investigate current price API accuracy
+- [x] Fix metals price data to show correct live market prices
+- [x] Verify all four metals (gold, silver, platinum, palladium) show accurate prices
+
+## Production Polish
+- [ ] Test signup/login with Supabase
+- [ ] Test portfolio CRUD operations
+- [ ] Verify price updates work correctly
+- [ ] Test dashboard calculations
+- [ ] Verify metal detail pages load correctly
+- [ ] Test responsive design on mobile
+- [ ] Fix any remaining bugs
+- [ ] Optimize performance

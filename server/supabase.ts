@@ -17,6 +17,7 @@ export const supabaseAdmin = createClient(
 export type User = {
   id: string;
   email: string;
+  password_hash?: string | null;
   name: string | null;
   currency: string;
   weight_unit: string;
@@ -69,26 +70,36 @@ export async function createUser(
   passwordHash: string,
   name?: string
 ): Promise<User | null> {
-  const { data, error } = await supabaseAdmin
-    .from("users")
-    .insert([
-      {
-        email,
-        password_hash: passwordHash,
-        name: name || null,
-        currency: "USD",
-        weight_unit: "grams",
-      },
-    ])
-    .select()
-    .single();
+  try {
+    const { data, error } = await supabaseAdmin
+      .from("users")
+      .insert([
+        {
+          email,
+          password_hash: passwordHash,
+          name: name || null,
+          currency: "USD",
+          weight_unit: "grams",
+        },
+      ])
+      .select()
+      .single();
 
-  if (error) {
-    console.error("Error creating user:", error);
+    if (error) {
+      console.error("Error creating user:", error);
+      return null;
+    }
+
+    if (!data) {
+      console.error("No data returned from createUser");
+      return null;
+    }
+
+    return data as User;
+  } catch (err) {
+    console.error("Exception in createUser:", err);
     return null;
   }
-
-  return data as User;
 }
 
 export async function getUserHoldings(userId: string): Promise<Holding[]> {

@@ -1,8 +1,7 @@
 import { Router, Request, Response } from "express";
 import * as bcrypt from "bcryptjs";
-import { supabaseAdmin } from "./supabase";
-import { createUser, getUserByEmail } from "./supabase";
 import * as jwt from "jsonwebtoken";
+import { supabaseAdmin } from "./supabase";
 import { ENV } from "./_core/env";
 
 const router = Router();
@@ -12,12 +11,18 @@ router.post("/signup", async (req: Request, res: Response) => {
   try {
     const { email, password, name } = req.body;
 
+    // Validate input
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
     // Check if user already exists
-    const existingUser = await getUserByEmail(email);
+    const { data: existingUser } = await supabaseAdmin
+      .from("users")
+      .select("id")
+      .eq("email", email)
+      .single();
+
     if (existingUser) {
       return res.status(409).json({ error: "User already exists" });
     }
@@ -26,15 +31,27 @@ router.post("/signup", async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user in Supabase
-    const user = await createUser(email, hashedPassword, name);
-    if (!user) {
+    const { data: newUser, error: insertError } = await supabaseAdmin
+      .from("users")
+      .insert({
+        email,
+        password_hash: hashedPassword,
+        name: name || null,
+        currency: "USD",
+        weight_unit: "grams",
+      })
+      .select()
+      .single();
+
+    if (insertError || !newUser) {
+      console.error("Insert error:", insertError);
       return res.status(500).json({ error: "Failed to create user" });
     }
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      ENV.jwtSecret || "your-secret-key",
+      { userId: newUser.id, email: newUser.email },
+      ENV.jwtSecret || "default-secret",
       { expiresIn: "7d" }
     );
 
@@ -42,16 +59,16 @@ router.post("/signup", async (req: Request, res: Response) => {
     res.cookie("auth_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res.status(201).json({
       success: true,
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
+        id: newUser.id,
+        email: newUser.email,
+        name: newUser.name,
       },
       token,
     });
@@ -71,20 +88,18 @@ router.post("/login", async (req: Request, res: Response) => {
     }
 
     // Get user from Supabase
-    const user = await getUserByEmail(email);
-    if (!user) {
+    const { data: user, error: selectError } = await supabaseAdmin
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
+
+    if (selectError || !user) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
     // Compare passwords
-    const userWithPassword = await supabaseAdmin
-      .from("users")
-      .select("password_hash")
-      .eq("id", user.id)
-      .single();
-    
-    const passwordHash = (userWithPassword.data as any)?.password_hash;
-    const isPasswordValid = await bcrypt.compare(password, passwordHash || "");
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash || "");
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
@@ -92,7 +107,7 @@ router.post("/login", async (req: Request, res: Response) => {
     // Generate JWT token
     const token = jwt.sign(
       { userId: user.id, email: user.email },
-      ENV.jwtSecret || "your-secret-key",
+      ENV.jwtSecret || "default-secret",
       { expiresIn: "7d" }
     );
 
@@ -100,8 +115,8 @@ router.post("/login", async (req: Request, res: Response) => {
     res.cookie("auth_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res.status(200).json({
@@ -119,29 +134,17 @@ router.post("/login", async (req: Request, res: Response) => {
   }
 });
 
-// Logout endpoint
-router.post("/logout", (req: Request, res: Response) => {
-  res.clearCookie("auth_token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-  });
-
-  return res.status(200).json({ success: true });
-});
-
 // Get current user endpoint
 router.get("/me", async (req: Request, res: Response) => {
   try {
     const token = req.cookies.auth_token;
+
     if (!token) {
       return res.status(401).json({ error: "Not authenticated" });
     }
 
-    const decoded = jwt.verify(
-      token,
-      ENV.jwtSecret || "your-secret-key"
-    ) as any;
+    // Verify token
+    const decoded = jwt.verify(token, ENV.jwtSecret || "default-secret") as any;
 
     // Get user from Supabase
     const { data: user, error } = await supabaseAdmin
@@ -151,20 +154,32 @@ router.get("/me", async (req: Request, res: Response) => {
       .single();
 
     if (error || !user) {
-      return res.status(401).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found" });
     }
 
     return res.status(200).json({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      currency: user.currency,
-      weight_unit: user.weight_unit,
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
     });
   } catch (error) {
-    console.error("Auth check error:", error);
+    console.error("Get user error:", error);
     return res.status(401).json({ error: "Invalid token" });
   }
+});
+
+// Logout endpoint
+router.post("/logout", (req: Request, res: Response) => {
+  res.clearCookie("auth_token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+  });
+
+  return res.status(200).json({ success: true });
 });
 
 export default router;
