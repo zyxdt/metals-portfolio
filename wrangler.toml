@@ -1,24 +1,26 @@
-name = "metalsdash-backend"
-type = "service"
+name = "metals-portfolio-api"
 main = "dist/index.js"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-12-19"
+compatibility_flags = ["nodejs_compat"]
 
 [env.production]
-name = "metalsdash-backend"
-routes = [
-  { pattern = "api.metalsdash.pages.dev/*", zone_name = "metalsdash.pages.dev" }
-]
+name = "metals-portfolio-api"
 
 [build]
 command = "pnpm build"
 cwd = "."
+watch_paths = ["server/**/*.ts", "client/src/**/*.ts"]
 
 [env.production.vars]
 NODE_ENV = "production"
+ENVIRONMENT = "production"
 
 [env.production.secrets]
 # These will be set via Cloudflare dashboard
-# - VITE_SUPABASE_URL
-# - VITE_SUPABASE_ANON_KEY
-# - SUPABASE_SERVICE_ROLE_KEY
-# - JWT_SECRET
+VITE_SUPABASE_URL = ""
+VITE_SUPABASE_ANON_KEY = ""
+SUPABASE_SERVICE_ROLE_KEY = ""
+JWT_SECRET = ""
+
+[observability]
+enabled = true

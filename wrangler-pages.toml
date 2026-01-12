@@ -4,14 +4,15 @@
 [build]
 command = "pnpm build"
 cwd = "."
-watch_paths = ["client/src/**/*.tsx", "client/src/**/*.ts"]
+watch_paths = ["client/src/**/*.tsx", "client/src/**/*.ts", "drizzle/schema.ts"]
 
 [build.upload]
-dir = "dist"
+dir = "dist/public"
 
 [env.production]
-name = "metalsdash"
+name = "metals-portfolio"
 
 [env.production.vars]
-VITE_SUPABASE_URL = "https://mccsiaujlmoeklarjnpy.supabase.co"
-VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jY3NpYXVqbG1vZWtsYXJqbnB5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjczOTIzMTEsImV4cCI6MjA4Mjk2ODMxMX0.XIU0kd8ZWlii3AhkiGI9mnyN7jiyIQCbDSXcsxVmd5M"
+VITE_SUPABASE_URL = ""
+VITE_SUPABASE_ANON_KEY = ""
+VITE_API_BASE = "https://api.example.com"
