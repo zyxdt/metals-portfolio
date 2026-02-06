@@ -1,0 +1,63 @@
+// Mock price data for development/demo
+// In production, this would come from the backend API
+
+export const getMockPrices = () => {
+  return [
+    {
+      name: "Gold",
+      metalType: "gold",
+      symbol: "AU",
+      color: "#FFD700",
+      pricePerOunce: 2045.50,
+      pricePerGram: 65.75,
+      previousClose: 2038.00,
+      dayHigh: 2052.00,
+      dayLow: 2035.00,
+      changePercent: 0.37,
+      currency: "USD",
+      fetchedAt: new Date(),
+    },
+    {
+      name: "Silver",
+      metalType: "silver",
+      symbol: "AG",
+      color: "#C0C0C0",
+      pricePerOunce: 24.35,
+      pricePerGram: 0.78,
+      previousClose: 24.10,
+      dayHigh: 24.65,
+      dayLow: 24.00,
+      changePercent: 1.04,
+      currency: "USD",
+      fetchedAt: new Date(),
+    },
+    {
+      name: "Platinum",
+      metalType: "platinum",
+      symbol: "PT",
+      color: "#E5E4E2",
+      pricePerOunce: 1038.75,
+      pricePerGram: 33.38,
+      previousClose: 1032.00,
+      dayHigh: 1045.00,
+      dayLow: 1030.00,
+      changePercent: 0.66,
+      currency: "USD",
+      fetchedAt: new Date(),
+    },
+    {
+      name: "Palladium",
+      metalType: "palladium",
+      symbol: "PD",
+      color: "#F0F0F0",
+      pricePerOunce: 985.25,
+      pricePerGram: 31.65,
+      previousClose: 978.50,
+      dayHigh: 992.00,
+      dayLow: 975.00,
+      changePercent: 0.69,
+      currency: "USD",
+      fetchedAt: new Date(),
+    },
+  ];
+};

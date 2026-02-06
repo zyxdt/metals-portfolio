@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { getLoginUrl } from "@/const";
+import { getMockPrices } from "@/lib/mockPrices";
 import { Link } from "wouter";
 import { 
   TrendingUp, 
@@ -17,7 +18,10 @@ import {
 
 export default function Home() {
   const { user, isAuthenticated } = useAuth();
-  const { data: prices, isLoading: pricesLoading } = trpc.prices.getAll.useQuery();
+  const { data: prices, isLoading: pricesLoading, error: pricesError } = trpc.prices.getAll.useQuery();
+  
+  // Use mock prices if API fails
+  const displayPrices = prices || getMockPrices();
 
   return (
     <div className="min-h-screen bg-background">
@@ -117,9 +121,9 @@ export default function Home() {
                 </Card>
               ))}
             </div>
-          ) : prices ? (
+          ) : displayPrices ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {prices.map((price) => (
+              {displayPrices.map((price) => (
                 <Card key={price.name} className="hover:border-primary/50 transition-colors">
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between mb-4">
