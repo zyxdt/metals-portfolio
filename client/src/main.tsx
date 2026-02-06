@@ -38,8 +38,9 @@ queryClient.getMutationCache().subscribe(event => {
 });
 
 // Get API base URL from environment or use relative path
-const apiBase = import.meta.env.VITE_API_BASE || "";
-const apiUrl = apiBase ? `${apiBase}/api/trpc` : "/api/trpc";
+const apiBase = import.meta.env.VITE_API_BASE?.trim() || "";
+const apiUrl = apiBase && apiBase.length > 0 ? `${apiBase}/api/trpc` : "/api/trpc";
+console.log("[tRPC] Using API URL:", apiUrl, "(VITE_API_BASE:", apiBase, ")");
 
 const trpcClient = trpc.createClient({
   links: [
